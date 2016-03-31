@@ -23,6 +23,9 @@ void GsmSMS::sendSMS(QString mes, QString phone)
 {
         //m_reader->check();
         qDebug() << "Send sms";
+        qDebug() << phone;
+        qDebug() << mes;
+
         QSMSMessage sms;
         sms.setText(mes);
 
@@ -60,7 +63,7 @@ void GsmSMS::readSmsMessages(const bool deleteSmsAfterRead)
             QVariantList params;
             params << 7
                    << 3
-                   << message->message.timestamp().date()
+                   << message->message.timestamp()
                    << message->message.timestamp().time()
                    << message->message.text();
 
