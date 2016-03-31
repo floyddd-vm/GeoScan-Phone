@@ -1,0 +1,10 @@
+<RCC>
+    <qresource>
+        <file>qtlabscontrols.conf</file>
+        <file>mainSMS.qml</file>
+        <file>images/ArrowLeft.png</file>
+        <file>images/sendSms.png</file>
+        <file>dialogList.qml</file>
+        <file>chatList.qml</file>
+    </qresource>
+</RCC>
