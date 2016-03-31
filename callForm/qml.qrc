@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/call.png</file>
+        <file>icons/contacts.png</file>
+        <file>icons/history.png</file>
+        <file>incoming_call.qml</file>
+        <file>icons/avatar.png</file>
+        <file>icons/accept.png</file>
+		<file>icons/back.png</file>
+        <file>icons/decline.png</file>
+        <file>addContact.qml</file>
+        <file>main.qml</file>
+        <file>qtlabscontrols.conf</file>
+        
+    </qresource>
+</RCC>
