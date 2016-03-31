@@ -4,7 +4,7 @@
 #include <QtSql>
 
 /* Директивы имен таблицы, полей таблицы и базы данных */
-#define DATABASE_NAME       "D:\\qt-dialer-master\\DB\\Contacts.sqlite"
+#define DATABASE_NAME       "C:\\Users\\floyd\\Documents\\qt\\phone\\ANTON\\serviceApp\\DB\\Contacts.sqlite"
 #define T_CONTACTS          "contacts"
 #define T_LOGS              "logs"
 #define T_MESSAGES          "messages"
