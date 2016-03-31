@@ -67,7 +67,7 @@ void GsmModem::init(const QString& name, int baudrate)
         init_pos_ = 0;
         init_list_<<"AT"
                  <<"AT+CMEE=1"  //enable +CME ERROR code
-                 <<"AT+CMGF=0"  // Sms mode DPU
+                 <<"AT+CMGF=1"  // Sms
                  <<"AT+CGMI"    //device manufacturer
                  <<"AT+CGMM"    //model of the device
                  <<"AT+CGSN"    //IMEI

@@ -6,7 +6,7 @@ HEADERS       = \
 SOURCES       = server.cpp \
                 main.cpp \
     sockext.cpp
-
+CONFIG+= c++11
 include(gsm/gsm.pri)
 include(gsmcomm/gsmcomm.pri)
 include(DB/gsmdb.pri)

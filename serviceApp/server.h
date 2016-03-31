@@ -79,7 +79,6 @@ public slots:
     void onSmsRecieved(QString smsText, QString sender);
     void sendCmd();
     void sockRead();
-    void onFinished(const QString &id, const int &code);
 private:
     QLabel *statusLabel;
     QPushButton *quitButton;
