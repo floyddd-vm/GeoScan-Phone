@@ -50,6 +50,7 @@
 #include <qtelephonynamespace.h>
 #include <qatchat.h>
 
+
 Server::Server(QWidget *parent)
     : QDialog(parent)
 {
@@ -61,7 +62,7 @@ Server::Server(QWidget *parent)
     writeButton = new QPushButton(tr("write"));
     writeButton->setAutoDefault(false);
     modem = new GsmModem();
-    modem->init("COM3",115200);
+    modem->init("COM19",115200);
     connect(modem, SIGNAL(initialized(bool)), this, SLOT(onInitialized(bool)));
     //connect(modem, SIGNAL(operatorName(QString)), this, SLOT(onOperatorName(QString)));
     //connect(modem, SIGNAL(signalLevels(int,int)), this, SLOT(onSignalLevel(int,int)));
@@ -105,6 +106,7 @@ void Server::onInitialized(bool initialized)
         smsObj = new GsmSMS(modem);
 
         connect(smsObj, SIGNAL(SmsRecieved(QString, QString)),this, SLOT(onSmsRecieved(QString, QString)));
+        connect(smsObj, SIGNAL(smsSenderSign(QString,int)), this, SLOT(onFinished(QString,int)));
 
         //Обрабтка события входящего звонка
         modem->primaryAtChat()->registerNotificationType
@@ -120,6 +122,17 @@ void Server::onInitialized(bool initialized)
     }
 }
 
+void Server::onFinished(const QString  &id, const int  &code)
+{
+    for(int i=0;i<sockets.count(); i++)
+    {
+        qDebug() << "soc: " << sockets.at(i)->socket << "type : " << sockets.at(i)->type;
+        if(sockets.at(i)->type == 2)
+        {
+            sockWrite(sockets.at(i)->socket, "STATUS:" + code);
+        }
+    }
+}
 
 void Server::onSmsRecieved(QString smsText, QString sender)
 {
@@ -192,23 +205,17 @@ void Server::sockRead()
         {
             qDebug() << "socD: " << sockets.at(i)->socket->socketDescriptor() << "socD: " << se->socketDescriptor();
             if(sockets.at(i)->socket->socketDescriptor() == se->socketDescriptor())
-            {
+            {               
                 sockets[i]->type = ATcmd.mid(4).toInt();
             }
         }
         return;
     }
-    if(ATcmd.indexOf("EXIT") != -1)
+    if(ATcmd.indexOf("SMS:") != -1)
     {
-        for(int i=0;i<sockets.count(); i++)
-        {
-            if(sockets.at(i)->socket->socketDescriptor() == se->socketDescriptor())
-            {
-                sockets.takeAt(i);
-                isCallApp = false;
-                qDebug() << "Call exit";
-            }
-        }
+        ATcmd.remove(0,4);
+        int pos = ATcmd.indexOf(",");
+        smsObj->sendSMS( ATcmd.mid(pos+1, ATcmd.length()-pos) ,ATcmd.left(pos));
     }
     else
         modem->primaryAtChat()->send(ATcmd);
@@ -217,52 +224,51 @@ void Server::sockRead()
 
 void Server::callEvent(QString number)
 {
-    //  TODO: запуск callApp и проверка на запущенность
-    //int i = sockets.indexOf("1");
+    int start = number.indexOf("\"")+1;
+    int end = number.indexOf("\"",start);
     if(!isCallApp)
-    {
-        QString path = "C:\\handset.exe -" + number;
-        qDebug() << path;
-        QProcess process;
-        process.startDetached(path);
-         //запуск callApp
-        qDebug() << process.errorString();
-        /*
-        while(process.state() != QProcess::Running)
         {
-            qDebug() << process.state();
-            Sleep(500);
-        }
-        */
-        isCallApp = true;
-        //sockWrite(callSock, "RING:" + number);
-        return;
-    }
-        int start = number.indexOf("\"")+1;
-        int end = number.indexOf("\"",start);
-        qDebug() << start<<"  "<<end;
-        qDebug() << "Call event: " ;
-        for(int i=0;i<sockets.count(); i++)
-        {
-            qDebug() << "soc: " << sockets.at(i)->socket << "type : " << sockets.at(i)->type;
-            if(sockets.at(i)->type == 1)
+
+            QString path = "C:\\handset.exe -" + number.mid(start,end-start);
+            qDebug() << path;
+            QProcess process;
+            process.startDetached(path);
+             //запуск callApp
+            qDebug() << process.errorString();
+            /*
+            while(process.state() != QProcess::Running)
             {
-                sockWrite(sockets.at(i)->socket, "RING:" + number.mid(start,end-start));
+                qDebug() << process.state();
+                Sleep(500);
             }
+            */
+            isCallApp = true;
+            //sockWrite(callSock, "RING:" + number);
+            return;
         }
+
+    qDebug() << start<<"  "<<end;
+    qDebug() << "Call event: " ;
+
+
+    for(int i=0;i<sockets.count(); i++)
+       {
+          qDebug() << "soc: " << sockets.at(i)->socket << "type : " << sockets.at(i)->type;
+          if(sockets.at(i)->type == 1)
+          {
+              sockWrite(sockets.at(i)->socket, "RING:" + number.mid(start,end-start));
+          }
+     }
 }
 
 void Server::sendCmd()
 {
+
     QString ATcmd = "123456";
-    callEvent("123456789");
-    /*
     for( int i=0; i<sockets.count(); ++i )
     {
         sockWrite(sockets.at(i)->socket, "RING:" + ATcmd);
     }
-    */
-
 }
 
 
