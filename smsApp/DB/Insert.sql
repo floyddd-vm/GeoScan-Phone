@@ -1,4 +1,3 @@
-/*
 INSERT INTO contacts (FirstName, SecondName, PhoneNumber)
 VALUES ("Феодосия",  "Третьякова", "111");
 */
